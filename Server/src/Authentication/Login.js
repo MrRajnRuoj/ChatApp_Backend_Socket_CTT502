@@ -7,9 +7,9 @@ const User = require('./../Users/User');
 const { addConnectedUser } = require('./../Users');
 
 const validateLogin = (socket, loginData) => {
-    if (loginData == null || loginData == undefined) return;
+    if (loginData === null || loginData === undefined) return;
     try {
-        const sql = `SELECT * FROM account WHERE email = ${DB.escape(loginData.email)}`;
+        const sql = `SELECT * FROM accounts WHERE email = ${DB.escape(loginData.email)}`;
         DB.query(sql, (err, result) => {
             if (err) {
                 socket.emit(Events.RESPONSE_LOGIN, Error.unknowError());

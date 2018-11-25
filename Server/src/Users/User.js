@@ -1,12 +1,12 @@
+let connectedSockets = {};
 class User {
     constructor(socket, userInfo) {
         this.id = userInfo.id;
         this.email = userInfo.email;
         // ...    
-        this.connectedSockets[userInfo.id] = socket;
+        connectedSockets[userInfo.id] = socket;
     }
 
-    static connectedSockets = {};
 
     exportInfo() {
         return {

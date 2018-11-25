@@ -18,5 +18,12 @@ module.exports = {
             error: true,
             message: `EMAIL_OR_PASSWORD_NOT_CORRECT`
         }
+    },
+
+    emailAlreadyExisted() {
+        return {
+            error: true,
+            message: `EMAIL_ALREADY_EXISTS`
+        }
     }
 }
