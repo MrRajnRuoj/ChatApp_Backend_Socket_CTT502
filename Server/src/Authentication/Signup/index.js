@@ -1,7 +1,7 @@
 const sha256 = require('sha256');
-const Events = require('./../Events/Events');
-const Error = require('./../Errors/Error');
-const { sendVerifyCode } = require('./../MailService');
+const Events = require('./../../Events/Events');
+const Error = require('./../../Errors/Error');
+const { sendVerifyCode } = require('./../../MailService');
 
 const validateSignup = (socket, signupData) => {
     if (signupData === null || signupData === undefined) return;
@@ -42,6 +42,42 @@ const validateSignup = (socket, signupData) => {
     }
 }
 
+const verifyEmail = (socket, verifyData) => {
+    if (verifyData === null || verifyData === undefined) return;
+    try {
+        const sql = `SELECT code FROM verify_email WHERE email = ${DB.escape(verifyData.email)}`;
+        DB.query(sql, (err, code) => {
+            if (err || code === null) {
+                socket.emit(Events.RESPONSE_VERIFY_EMAIL, Error.unknowError());
+            }
+            else if (code !== verifyData.code) {
+                socket.emit(Events.RESPONSE_VERIFY_EMAIL, Error.incorrectVerifyCode());
+            }
+            else if (code === verifyData.code) {
+                const sql = `UPDATE accounts SET verified = 1 WHERE email = ${DB.escape(verifyData.email)}`;
+                DB.query(sql, (err) => {
+                    if (err) {
+                        socket.emit(Events.RESPONSE_VERIFY_EMAIL, Error.unknowError());
+                    }
+                    else {
+                        socket.emit(Events.RESPONSE_VERIFY_EMAIL, {
+                            error: false,
+                            message: 'VERIFY_SUCCESSFULLY'
+                        });
+                        const sql = `DELETE FROM verify_email WHERE email = ${DB.escape(verifyData.email)}`
+                        DB.query(sql, (err) => {
+                            console.log(err);
+                        });
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
-    validateSignup
+    validateSignup,
+    verifyEmail
 }

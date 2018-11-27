@@ -1,10 +1,10 @@
 const sha256 = require('sha256');
 const jwt = require('jsonwebtoken');
-const { SECRET_KEY } = require('./../Configs');
-const Events = require('../Events/Events');
-const Error = require('../Errors/Error');
-const User = require('./../Users/User');
-const { addConnectedUser } = require('./../Users');
+const { SECRET_KEY } = require('./../../Configs');
+const Events = require('./../../Events/Events');
+const Error = require('./../../Errors/Error');
+const User = require('./../../Users/User');
+const { addConnectedUser } = require('./../../Users');
 
 const validateLogin = (socket, loginData) => {
     if (loginData === null || loginData === undefined) return;
@@ -18,7 +18,13 @@ const validateLogin = (socket, loginData) => {
                 socket.emit(Events.RESPONSE_LOGIN, Error.emailNotExist());
             } 
             else {
-                if (result[0].password !== sha256(loginData.password)) {
+                if (result[0].verified === 0) { // Email not verified yet
+                    socket.emit(Events.RESPONSE_LOGIN, {
+                        error: true,
+                        message: 'VERIFY_ACCOUNT'
+                    });
+                }
+                else if (result[0].password !== sha256(loginData.password)) {
                     socket.emit(Events.RESPONSE_LOGIN, Error.emailOrPasswordNotCorrect());
                 }
                 else {  // Login successfully

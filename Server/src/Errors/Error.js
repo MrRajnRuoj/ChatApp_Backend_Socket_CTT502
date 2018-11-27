@@ -25,5 +25,12 @@ module.exports = {
             error: true,
             message: `EMAIL_ALREADY_EXISTS`
         }
+    },
+
+    incorrectVerifyCode() {
+        return {
+            error: true, 
+            message: `INCORRECT_VERIFY_CODE`
+        }
     }
 }
