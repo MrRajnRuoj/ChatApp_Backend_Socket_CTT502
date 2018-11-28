@@ -46,14 +46,14 @@ const verifyEmail = (socket, verifyData) => {
     if (verifyData === null || verifyData === undefined) return;
     try {
         const sql = `SELECT code FROM verify_email WHERE email = ${DB.escape(verifyData.email)}`;
-        DB.query(sql, (err, code) => {
-            if (err || code === null) {
+        DB.query(sql, (err, result) => {
+            if (err || result.length === 0) {
                 socket.emit(Events.RESPONSE_VERIFY_EMAIL, Error.unknowError());
             }
-            else if (code !== verifyData.code) {
+            else if (result[0].code !== verifyData.code) {
                 socket.emit(Events.RESPONSE_VERIFY_EMAIL, Error.incorrectVerifyCode());
             }
-            else if (code === verifyData.code) {
+            else if (result[0].code === verifyData.code) {
                 const sql = `UPDATE accounts SET verified = 1 WHERE email = ${DB.escape(verifyData.email)}`;
                 DB.query(sql, (err) => {
                     if (err) {

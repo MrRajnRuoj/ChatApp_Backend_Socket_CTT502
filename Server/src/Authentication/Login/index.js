@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { SECRET_KEY } = require('./../../Configs');
 const Events = require('./../../Events/Events');
 const Error = require('./../../Errors/Error');
-const User = require('./../../Users/User');
+const User = require('./../../Users');
 const { addConnectedUser } = require('./../../Users');
 
 const validateLogin = (socket, loginData) => {
