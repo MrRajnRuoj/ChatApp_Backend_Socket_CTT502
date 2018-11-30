@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const sendVerifyCode = (socket, code, email) => {
+const sendVerifyCode = (socket, code, email, callback) => {
     let message = {
         from: 'Zoola Support <support@zoola.com>', // sender address
         to: email, // list of receivers
@@ -37,10 +37,7 @@ const sendVerifyCode = (socket, code, email) => {
             socket.emit(Events.RESPONSE_SIGNUP, Error.unknowError());
             return console.log(error);
         }
-        socket.emit(Events.RESPONSE_SIGNUP, {
-            error: false,
-            message: 'VERIFY_ACCOUNT'
-        });
+        callback();
         console.log(info);
     });
 }

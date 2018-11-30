@@ -30,7 +30,12 @@ const validateSignup = (socket, signupData) => {
                                 socket.emit(Events.RESPONSE_SIGNUP, Error.unknowError());
                             }
                             else {
-                                sendVerifyCode(socket, code, signupData.email);
+                                sendVerifyCode(socket, code, signupData.email, () => {
+                                    socket.emit(Events.RESPONSE_SIGNUP, {
+                                        error: false,
+                                        message: 'VERIFY_ACCOUNT'
+                                    });
+                                });
                             }
                         });
                     }
@@ -77,7 +82,31 @@ const verifyEmail = (socket, verifyData) => {
     }
 }
 
+const resendVerifyCode = (socket, data) => {
+    if (data === null || data === undefined) return;
+    try {
+        const code = Math.round(Math.random() * (9999 - 1000) + 1000);
+        const sql = `UPDATE verify_email SET code = ${code} WHERE email = ${DB.escape(data.email)}`;
+        DB.query(sql, (err, result) => {
+            if (err) {
+                socket.emit(Events.RESPONSE_RESEND_VERIFY_CODE, Error.unknowError());
+            }
+            else {
+                sendVerifyCode(socket, code, data.email, () => {
+                    socket.emit(Events.RESPONSE_RESEND_VERIFY_CODE, {
+                        error: false,
+                        message: 'VERIFY_ACCOUNT'
+                    });
+                });
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     validateSignup,
-    verifyEmail
+    verifyEmail,
+    resendVerifyCode
 }
