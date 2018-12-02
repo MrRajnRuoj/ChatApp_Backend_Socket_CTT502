@@ -2,8 +2,11 @@
 
 ### 1. Request Signup 
 **Method:** `emit`
+
 **Event:** `REQUEST_SIGNUP`
+
 **Parameter:**
+
 | Field    | Type   | Description       |
 |:----------:|:--------:|:-------------------:|
 | email    | String | Email của user    |
