@@ -14,13 +14,18 @@
 
 ### 2. Response Signup 
 **Method:** `on`
+
 **Event:** `RESPONSE_SIGNUP`
+
 **Parameter:**
+
 | Field    | Type   | Description       |
 |:----------:|:--------:|:-------------------:|
 | error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
 | message | String | Thông điệp trả về |
+
 **[message]**
+
 |Error Status| Label                | Description                                |
 |:----:|:----------------------:|:--------------------------------------------:|
 |true| `UNKNOW_ERROR`         | Lỗi không xác định :))                     |
@@ -29,8 +34,11 @@
 
 ### 3. Request Login 
 **Method:** `emit`
+
 **Event:** `REQUEST_LOGIN`
+
 **Parameter:**
+
 | Field    | Type   | Description       |
 |:----------:|:--------:|:-------------------:|
 | token    | String | Token đăng nhập của user    |
@@ -39,21 +47,28 @@
 
 ### 4. Response Login 
 **Method:** `on`
+
 **Event:** `RESPONSE_LOGIN`
+
 **Parameter:**
+
 | Field    | Type   | Description       |
 |:----------:|:--------:|:-------------------:|
 | error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
 | message | String | Thông điệp trả về |
 |token|String|Token đăng nhập|
 |userInfo|Object|Thông tin user|
+
 **[userInfo]**
+
 |   Field  |  Type  |    Description    |
 |:--------:|:------:|:-----------------:|
 |    id    | Int    | ID của user       |
 |   email  | String | Email của user    |
 | nickName | String | Nickname của user |
+
 **[message]**
+
 | Error Status |             Label             |                 Description                 |
 |:------------:|:-----------------------------:|:-------------------------------------------:|
 |     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
