@@ -24,6 +24,7 @@
 | error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
 | message | String | Thông điệp trả về |
 
+
 **[message]**
 
 |Error Status| Label                | Description                                |
@@ -59,6 +60,7 @@
 |token|String|Token đăng nhập|
 |userInfo|Object|Thông tin user|
 
+
 **[userInfo]**
 
 |   Field  |  Type  |    Description    |
@@ -66,6 +68,7 @@
 |    id    | Int    | ID của user       |
 |   email  | String | Email của user    |
 | nickName | String | Nickname của user |
+
 
 **[message]**
 
