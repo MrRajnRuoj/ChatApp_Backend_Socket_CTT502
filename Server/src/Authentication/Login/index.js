@@ -36,7 +36,7 @@ const validateLogin = (socket, loginData) => {
                     let user = new User(socket, result[0]);
                     socket.emit(Events.RESPONSE_LOGIN, {
                         error: false,
-                        message: '',
+                        message: 'LOGIN_SUCCESS',
                         userInfo: user.exportInfo(),
                         token
                     });
