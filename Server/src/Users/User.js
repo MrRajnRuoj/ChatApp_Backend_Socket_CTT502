@@ -10,7 +10,7 @@ class User {
     }
 
 
-    exportInfo = () => {
+    exportInfo() {
         return {
             id: this.id,
             email: this.email,
