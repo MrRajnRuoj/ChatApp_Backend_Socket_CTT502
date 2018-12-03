@@ -80,4 +80,70 @@
 |     true     | `EMAIL_OR_PASSWORD_NOT_CORRECT` | Sai tài khoản hoặc mật khẩu                 |
 |     false    | `LOGIN_SUCCESS`                 | Đăng nhập thành công                        |
 
+
+### 5. Request Verify Email 
+**Method:** `emit`
+
+**Event:** `REQUEST_VERIFY_EMAIL`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| email    | String | Email của user    |
+| code | Int | Verify code |
+
+### 6. Response Verify Email 
+**Method:** `on`
+
+**Event:** `RESPONSE_VERIFY_EMAIL`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
+|     false     | `VERIFY_SUCCESSFULLY`          | Verify thành công                          |
+|     true    | `INCORRECT_VERIFY_CODE`                | Verify code không chính xác |
+
+
+### 7. Request Resend Verify Code
+**Method:** `emit`
+
+**Event:** `REQUEST_RESEND_VERIFY_CODE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| email    | String | Email của user    |
+
+### 8. Response Resend Verify Code
+**Method:** `on`
+
+**Event:** `RESPONSE_RESEND_VERIFY_CODE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
+|     false     | `VERIFY_ACCOUNT`          | Yêu cầu verify email                          |
+
 ## vẫn còn tiếp....
