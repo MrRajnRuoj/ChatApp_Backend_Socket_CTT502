@@ -2,16 +2,12 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
-const { DBConnection } = require('./src/Configs');
+const { handleDisconnect } = require('./src/Configs');
 const SocketManager = require('./src/SocketManager');
 
 const PORT = process.env.PORT || 3231;
 
-DBConnection.connect((error) => {
-    if (error) throw error;
-    console.log('Connected to DB!');
-});
-global.DB = DBConnection;
+handleDisconnect();     // Create and handle DB connection
 
 io.sockets.on('connection', SocketManager);
 
