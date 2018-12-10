@@ -32,5 +32,19 @@ module.exports = {
             error: true, 
             message: `INCORRECT_VERIFY_CODE`
         }
+    },
+
+    messageNotSend() {
+        return {
+            error: true,
+            message: `MESSAGE_NOT_SEND`
+        }
+    },
+
+    invalidToken() {
+        return {
+            error: true,
+            message: `INVALID_TOKEN`
+        }
     }
 }

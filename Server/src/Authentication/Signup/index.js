@@ -5,6 +5,7 @@ const { sendVerifyCode } = require('./../../MailService');
 
 const validateSignup = (socket, signupData) => {
     if (signupData === null || signupData === undefined) return;
+    console.log(signupData);
     try {
         const sql = `SELECT * FROM accounts WHERE email = ${DB.escape(signupData.email)}`;
         DB.query(sql, (err, result) => {
@@ -15,10 +16,11 @@ const validateSignup = (socket, signupData) => {
                 socket.emit(Events.RESPONSE_SIGNUP, Error.emailAlreadyExisted());
             }
             else {
-                const sql = `INSERT INTO accounts (email, password, type, created_date, nick_name, verified) 
-                            VALUES (${DB.escape(signupData.email)}, '${sha256(signupData.password)}', 1, NOW(), null, 0)`;
+                const sql = `INSERT INTO accounts (email, password, type, created_date, verified) 
+                            VALUES (${DB.escape(signupData.email)}, '${sha256(signupData.password)}', 1, NOW(), 0)`;
                 DB.query(sql, (err, result) => {
                     if (err) {
+                        console.log(err);
                         socket.emit(Events.RESPONSE_SIGNUP, Error.unknowError());
                     }
                     else {
@@ -71,7 +73,9 @@ const verifyEmail = (socket, verifyData) => {
                         });
                         const sql = `DELETE FROM verify_email WHERE email = ${DB.escape(verifyData.email)}`
                         DB.query(sql, (err) => {
-                            console.log(err);
+                            if (err) {
+                                console.log(err);
+                            }
                         });
                     }
                 });
