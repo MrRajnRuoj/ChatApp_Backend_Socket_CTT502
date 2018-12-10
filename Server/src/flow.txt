@@ -1,2 +1,0 @@
-private chat:
-client send (userid, message) -> server -> clients recieve
