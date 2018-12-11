@@ -44,7 +44,7 @@ class User {
             else {
                 let chatBox = getConnectedChat(chatID);
                 if (chatBox === undefined || chatBox === null) {
-                    if (data.toUserID !== undefined || data.toUserID !== null) {    // Private chat
+                    if (data.toUserID !== undefined && data.toUserID !== null) {    // Private chat
                         chatBox = new ChatBox(chatID, [this.id, data.toUserID]);
                         chatBox.emitMessage({ 
                                 id: this.id, 
@@ -62,7 +62,9 @@ class User {
                                 connectedSockets[this.id].emit(Events.SEND_MESSAGE, Error.messageNotSend());
                             }
                             else {
-                                chatBox = new ChatBox(chatID, result);
+                                let listUserID = [];
+                                result.forEach((row) => listUserID.push(row.user_id));
+                                chatBox = new ChatBox(chatID, listUserID);
                                 chatBox.emitMessage({ 
                                         id: this.id, 
                                         email: this.email, 

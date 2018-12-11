@@ -8,16 +8,24 @@ class ChatBox {
     }
 
     emitMessage(sender, time, message) {
-        this.listUserID.forEach((userID) => {
-            getConnectedSocket(userID).emit(Events.RECIEVE_MESSAGE, {
-                senderID: sender.id,
-                senderEmai: sender.email,
-                senderNickName: sender.nickName,
-                time,
-                message,
-                chatID: this.chatID
+        try {
+            this.listUserID.forEach((userID) => {
+                let socket = getConnectedSocket(userID);
+                console.log(socket + ' - ' + userID);
+                if (socket !== undefined && socket !== null) {
+                    socket.emit(Events.RECIEVE_MESSAGE, {
+                        senderID: sender.id,
+                        senderEmai: sender.email,
+                        senderNickName: sender.nickName,
+                        time,
+                        message,
+                        chatID: this.chatID
+                    });
+                }
             });
-        });
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 
