@@ -1,7 +1,9 @@
+const { DateTime } = require('luxon');
+const uniqid = require('uniqid');
 const Events = require('./../Events/Events');
 const Error = require('./../Errors/Error');
-const { DateTime } = require('luxon');
 const { ChatBox, getConnectedChat } = require('./../Chat');
+const { getConnectedSocket } = require('./index');
 
 class User {
     constructor(userInfo) {
@@ -20,7 +22,7 @@ class User {
                     second_user_id = ${this.id} )`;
                     DB.query(sql, (err, result) => {
                         if (err) {
-                            connectedSockets[this.id].emit(Events.SEND_MESSAGE, Error.unknowError());
+                            getConnectedSocket(this.id).emit(Events.SEND_MESSAGE, Error.unknowError());
                         }
                         else {
                             chatID = result[0].chat_id;
@@ -89,6 +91,42 @@ class User {
                 }
             }
         });
+    }
+
+    requestFriend(userEmail) {
+        // relationship
+        // 1: pending_1_2
+        // 2: pending_2_1
+        // 3: blocking_1_2
+        // 4: blocking_2_1
+        try {
+            const sql = `SELECT * FROM accounts WHERE email = ${DB.escape(userEmail)}`;
+            DB.query(sql, (err, result) => {
+                if (err) {
+                    getConnectedSocket(this.id).emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
+                }
+                else {
+                    const secondUserID = result[0].account_id;
+                    const sql = `INSERT INTO relationship (first_user_id, second_user_id, type) VALUES (${this.id}, ${secondUserID}, 1)`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            getConnectedSocket[this.id].emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
+                        }
+                        else {
+                            const socket = getConnectedSocket(secondUserID);
+                            if (socket !== undefined && socket !== null) {
+                                socket.emit(Events.NOTIFY_FRIEND_REQUEST, {
+                                    error: false,
+                                    message: 'PENDING_FRIEND_REQUEST'
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     exportInfo() {
