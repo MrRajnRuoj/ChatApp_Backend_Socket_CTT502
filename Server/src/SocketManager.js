@@ -25,5 +25,13 @@ module.exports = function(socket) {
     socket.on(Events.SEND_MESSAGE, (data) => {
         getConnectedUser(socket.id).sendMessage(data);
     });
+
+    socket.on(Events.REQUEST_ADD_FRIEND, (data) => {
+        getConnectedUser(socket.id).requestFriend(data);
+    });
+
+    socket.on(Events.RESPONSE_ADD_FRIEND, (data) => {
+        getConnectedUser(socket.id).responseFriendRequest(data);
+    })
    
 }

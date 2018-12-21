@@ -93,12 +93,13 @@ class User {
         });
     }
 
-    requestFriend(userEmail) {
+    requestFriend(data) {
         // relationship
         // 1: pending_1_2
         // 2: pending_2_1
         // 3: blocking_1_2
         // 4: blocking_2_1
+        const { userEmail } = data;
         try {
             const sql = `SELECT * FROM accounts WHERE email = ${DB.escape(userEmail)}`;
             DB.query(sql, (err, result) => {
@@ -129,6 +130,13 @@ class User {
         }
     }
 
+    responseFriendRequest(data) {
+        const { isAccept } = data;
+        if (isAccept === true) {
+            
+        }
+    }
+    
     exportInfo() {
         return {
             id: this.id,
