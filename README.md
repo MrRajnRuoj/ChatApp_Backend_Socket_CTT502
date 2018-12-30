@@ -238,4 +238,11 @@
 |     false    | `ACCEPT_SUCCESSFULLY`          | Kết bạn thành công                         |
 
 
+### 14. Request Logout
+**Method:** `emit`
+
+**Event:** `REQUEST_LOGOUT`
+
+
+
 ## vẫn còn tiếp....
