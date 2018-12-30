@@ -112,7 +112,7 @@ class User {
                     const sql = `INSERT INTO relationship (first_user_id, second_user_id, type) VALUES (${this.id}, ${secondUserID}, 1)`;
                     DB.query(sql, (err, result) => {
                         if (err) {
-                            getConnectedSocket[this.id].emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
+                            getConnectedSocket(this.id).emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
                         }
                         else {
                             const socket = getConnectedSocket(secondUserID);
@@ -139,24 +139,24 @@ class User {
             const sql = `INSERT INTO chat_box (chat_id) VALUES (${chatID})`;
             DB.query(sql, (err, result) => {
                 if (err) {
-                    getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                    getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                 }
                 else {
                     const sql = `INSERT INTO private_chat (first_user_id, second_user_id, chat_id) 
                                 VALUES (${this.id}, ${userID}, '${chatID}')`;
                     DB.query(sql, (err, result) => {
                         if (err) {
-                            getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                            getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                         }
                         else {
                             const sql = `UPDATE relationship SET type = 0 WHERE (first_user_id = ${this.id} AND second_user_id = ${userID})
                                                                                 OR (first_user_id = ${userID} AND second_user_id = ${this.id})`;
                             DB.query(sql, (err, result) => {
                                 if (err) {
-                                    getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                                    getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                                 }
                                 else {
-                                    getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, {
+                                    getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, {
                                         error: false,
                                         message: 'ACCEPT_SUCCESSFULLY'
                                     });
@@ -167,6 +167,45 @@ class User {
                 }
             });
         }
+    }
+    
+    requestListFriend(data) {
+        const sql = `SELECT * FROM relationship WHERE (first_user_id = ${this.id} AND type = 0) OR
+                                                        (second_user_id = ${this.id} AND type = 0)`;
+        DB.query(sql, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                const totalFriend = result.length;
+                result.map((user) => {
+                    // Get friendID
+                    const friendID = user.first_user_id;    
+                    if (friendID === this.id) {
+                        friendID = user.second_user_id;
+                    }
+
+                    const  sql = `SELECT * FROM accounts WHERE account_id = ${friendID}`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            this.listFriend.push({
+                                id: result[0].account_id,
+                                email: result[0].email
+                            });
+                            if (this.listFriend.length === totalFriend) {
+                                getConnectedSocket(this.id).emit(Events.RESPONSE_LIST_FRIEND, {
+                                    error: false,
+                                    listFriend: this.listFriend
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+        });
     }
     
     exportInfo() {

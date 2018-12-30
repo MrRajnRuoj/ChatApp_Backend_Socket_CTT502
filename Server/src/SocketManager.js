@@ -39,4 +39,7 @@ module.exports = function(socket) {
         handleLogoutUser(socket);
     });
    
+    socket.on(Events.REQUEST_LIST_FRIEND, (data) => {
+        getConnectedUser(socket.id).requestListFriend(data);
+    });
 }
