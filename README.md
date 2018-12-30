@@ -296,5 +296,31 @@
 | chatID    | String    | chatID của người/group |
 
 
+### 18. Request List Friend
+**Method:** `emit`
+
+**Event:** `REQUEST_LIST_FRIEND`
+
+
+### 19. Response Request List Friend
+**Method:** `on`
+
+**Event:** `RESPONSE_LIST_FRIEND`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| listFriend | Array Object | Danh sách bạn bè |
+
+
+**[object]**
+
+|   Field  |  Type  |    Description    |
+|:--------:|:------:|:-----------------:|
+|    id    | Int    | ID của user       |
+|   email  | String | Email của user    |
+
 
 ## vẫn còn tiếp....
