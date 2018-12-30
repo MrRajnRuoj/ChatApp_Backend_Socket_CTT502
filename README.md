@@ -244,5 +244,57 @@
 **Event:** `REQUEST_LOGOUT`
 
 
+### 15. Send Message
+**Method:** `emit`
+
+**Event:** `SEND_MESSAGE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| chatID    | String | chatID của người/group muốn chat (có thể ko có)   |
+| toUserID    |  Int    |   ID của người muốn chat |
+| message   | String    | Nội dung tin nhắn     |
+
+
+### 16. Response Send Message
+**Method:** `on`
+
+**Event:** `SEND_MESSAGE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|    true      | `UNKNOW_ERROR`                 | Lỗi không xác định :))                     |
+|    true      | `MESSAGE_NOT_SEND`             | Message gửi ko thành công                  |
+
+
+### 17. Recieve Message
+**Method:** `on`
+
+**Event:** `RECIEVE_MESSAGE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| senderID | Int    | ID người gửi      |
+| senderEmail | String | Email người gửi |
+| senderNickName | String | Nickname người gửi |
+| time      | String    |   Thời gian gửi tính theo UTC +0, format: "yyyy-mm-dd hh:mm:ss" |
+| message | String | Nội dung tin nhắn |
+| chatID    | String    | chatID của người/group |
+
+
 
 ## vẫn còn tiếp....
