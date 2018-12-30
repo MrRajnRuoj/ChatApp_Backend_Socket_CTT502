@@ -95,6 +95,7 @@ class User {
 
     requestFriend(data) {
         // relationship
+        // 0: friend
         // 1: pending_1_2
         // 2: pending_2_1
         // 3: blocking_1_2
@@ -118,7 +119,8 @@ class User {
                             if (socket !== undefined && socket !== null) {
                                 socket.emit(Events.NOTIFY_FRIEND_REQUEST, {
                                     error: false,
-                                    message: 'PENDING_FRIEND_REQUEST'
+                                    message: 'PENDING_FRIEND_REQUEST',
+                                    userInfo: this.exportInfo()
                                 });
                             }
                         }
@@ -131,9 +133,39 @@ class User {
     }
 
     responseFriendRequest(data) {
-        const { isAccept } = data;
+        const { isAccept, userID } = data;
         if (isAccept === true) {
-            
+            const chatID = uniqid.process();
+            const sql = `INSERT INTO chat_box (chat_id) VALUES (${chatID})`;
+            DB.query(sql, (err, result) => {
+                if (err) {
+                    getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                }
+                else {
+                    const sql = `INSERT INTO private_chat (first_user_id, second_user_id, chat_id) 
+                                VALUES (${this.id}, ${userID}, '${chatID}')`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                        }
+                        else {
+                            const sql = `UPDATE relationship SET type = 0 WHERE (first_user_id = ${this.id} AND second_user_id = ${userID})
+                                                                                OR (first_user_id = ${userID} AND second_user_id = ${this.id})`;
+                            DB.query(sql, (err, result) => {
+                                if (err) {
+                                    getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                                }
+                                else {
+                                    getConnectedSocket[this.id].emit(Events.RESPONSE_FRIEND_REQUEST, {
+                                        error: false,
+                                        message: 'ACCEPT_SUCCESSFULLY'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         }
     }
     

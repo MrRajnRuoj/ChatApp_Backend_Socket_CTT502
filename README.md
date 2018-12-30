@@ -146,4 +146,96 @@
 |     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
 |     false     | `VERIFY_ACCOUNT`          | Yêu cầu verify email                          |
 
+### 9. Request Add Friend
+**Method:** `emit`
+
+**Event:** `REQUEST_ADD_FRIEND`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| userEmail    | String | Email của người muốn thêm bạn    |
+
+### 10. Response To Request Add Friend
+**Method:** `on`
+
+**Event:** `REQUEST_ADD_FRIEND`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
+
+### 11. Nontify Friend Request
+**Method:** `on`
+
+**Event:** `NOTIFY_FRIEND_REQUEST`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+| userInfo | Object | Thông tin người gửi yêu cầu |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                    |
+
+
+**[userInfo]**
+
+|   Field  |  Type  |    Description    |
+|:--------:|:------:|:-----------------:|
+|    id    | Int    | ID của user       |
+|   email  | String | Email của user    |
+| nickName | String | Nickname của user |
+
+### 12. Response Friend Request
+**Method:** `emit`
+
+**Event:** `RESPONSE_FRIEND_REQUEST`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| isAccept    | Boolean | `yes`: Đồng ý, `no`: Không đồng ý    |
+| userID    |  Int    |   ID của người gửi yêu cầu kết bạn |
+
+### 13. Response Friend Request
+**Method:** `on`
+
+**Event:** `RESPONSE_FRIEND_REQUEST`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                    |
+|     false    | `ACCEPT_SUCCESSFULLY`          | Kết bạn thành công                         |
+
+
 ## vẫn còn tiếp....
