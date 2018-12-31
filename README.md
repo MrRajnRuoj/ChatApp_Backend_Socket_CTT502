@@ -76,7 +76,7 @@
 |:------------:|:-----------------------------:|:-------------------------------------------:|
 |     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
 |     true     | `EMAIL_ALREADY_EXISTS`          | Email đã tồn tại                            |
-|     false    | `VERIFY_ACCOUNT`                | Email chưa xác thực, yêu cầu xác thực email |
+|     true    | `VERIFY_ACCOUNT`                | Email chưa xác thực, yêu cầu xác thực email |
 |     true     | `EMAIL_OR_PASSWORD_NOT_CORRECT` | Sai tài khoản hoặc mật khẩu                 |
 |     false    | `LOGIN_SUCCESS`                 | Đăng nhập thành công                        |
 
