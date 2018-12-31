@@ -79,11 +79,11 @@ public class RegisterActivity extends AppCompatActivity {
                         if (error) {
                             String message = object.getString("message");
                             switch (message) {
-                                default:
-                                    Toast.makeText(RegisterActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
-                                    break;
                                 case "EMAIL_ALREADY_EXISTS":
                                     Toast.makeText(RegisterActivity.this, "Email đã tồn tại", Toast.LENGTH_SHORT).show();
+                                    break;
+                                default:
+                                    Toast.makeText(RegisterActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
                                     break;
                             }
                             SocketSingleton.getSocket().off("RESPONSE_SIGNUP");

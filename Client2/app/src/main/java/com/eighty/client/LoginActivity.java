@@ -118,13 +118,6 @@ public class LoginActivity extends AppCompatActivity {
                                 case "EMAIL_OR_PASSWORD_NOT_CORRECT":
                                     Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu không chính xác", Toast.LENGTH_SHORT).show();
                                     break;
-                                default:
-                                    Toast.makeText(LoginActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
-                                    break;
-                            }
-                            SocketSingleton.getSocket().off("RESPONSE_LOGIN");
-                        } else {
-                            switch (message) {
                                 case "VERIFY_ACCOUNT":
                                 {
                                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(LoginActivity.this);
@@ -140,9 +133,27 @@ public class LoginActivity extends AppCompatActivity {
                                             startActivity(intent);
                                         }
                                     });
+                                    alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            Intent intent = new Intent(LoginActivity.this, VerifyActivity.class);
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("email", Objects.requireNonNull(edtEmail.getText()).toString());
+                                            intent.putExtras(bundle);
+                                            SocketSingleton.getSocket().off("RESPONSE_LOGIN");
+                                            startActivity(intent);
+                                        }
+                                    });
                                     alertDialog.show();
                                 }
-                                break;
+                                    break;
+                                default:
+                                    Toast.makeText(LoginActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                            SocketSingleton.getSocket().off("RESPONSE_LOGIN");
+                        } else {
+                            switch (message) {
                                 case "LOGIN_SUCCESS":
                                     SocketSingleton.getSocket().off("RESPONSE_LOGIN");
                                     String token = object.getString("token");
@@ -150,7 +161,15 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("token", token);
                                     editor.apply();
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    JSONObject user = object.getJSONObject("userInfo");
+                                    String email = user.getString("email");
+                                    int id = user.getInt("id");
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("email", email);
+                                    bundle.putInt("id", id);
+                                    intent.putExtras(bundle);
+                                    startActivity(intent);
                                     break;
                                 default:
                                     Toast.makeText(LoginActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
@@ -170,21 +189,21 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent callingIntent = getIntent();
-        Bundle bundle = callingIntent.getExtras();
-        if (bundle != null) {
-            String token = bundle.getString("token", "");
-            if (!Objects.equals(token, "")) {
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put("token", token);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                SocketSingleton.getSocket().emit("REQUEST_LOGIN", obj);
-                SocketSingleton.getSocket().on("RESPONSE_LOGIN", onResponseLogin);
-            }
-        }
+//        Intent callingIntent = getIntent();
+//        Bundle bundle = callingIntent.getExtras();
+//        if (bundle != null) {
+//            String token = bundle.getString("token", "");
+//            if (!Objects.equals(token, "")) {
+//                JSONObject obj = new JSONObject();
+//                try {
+//                    obj.put("token", token);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                SocketSingleton.getSocket().emit("REQUEST_LOGIN", obj);
+//                SocketSingleton.getSocket().on("RESPONSE_LOGIN", onResponseLogin);
+//            }
+//        }
 
         setContentView(R.layout.activity_login);
 

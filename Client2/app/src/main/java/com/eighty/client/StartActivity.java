@@ -40,19 +40,6 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        SocketSingleton.getSocket().connect();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("secret", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("token", "");
-
-        if (token != null && !token.equals("")) {
-            Intent intent = new Intent(StartActivity.this, LoginActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("token", token);
-            intent.putExtras(bundle);
-            startActivity(intent);
-        }
-
         initView();
         setListener();
     }

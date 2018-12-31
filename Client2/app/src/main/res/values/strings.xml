@@ -2,4 +2,6 @@
     <string name="app_name">Client</string>
     <string name="title_activity_login">Sign in</string>
     <string name="start_verify"><u>Xác nhận email</u></string>
+    <string name="Open">Open</string>
+    <string name="Close">Close</string>
 </resources>

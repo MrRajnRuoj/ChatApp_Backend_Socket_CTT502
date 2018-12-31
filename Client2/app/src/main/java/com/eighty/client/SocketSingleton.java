@@ -15,9 +15,9 @@ class SocketSingleton {
         return socket;
     }
 
-    static synchronized SocketSingleton getInstance() {
-        return ourInstance;
-    }
+//    static synchronized SocketSingleton getInstance() {
+//        return ourInstance;
+//    }
 
     private SocketSingleton() {
         try {
