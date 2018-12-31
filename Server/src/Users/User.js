@@ -1,7 +1,9 @@
+const { DateTime } = require('luxon');
+const uniqid = require('uniqid');
 const Events = require('./../Events/Events');
 const Error = require('./../Errors/Error');
-const { DateTime } = require('luxon');
 const { ChatBox, getConnectedChat } = require('./../Chat');
+const { getConnectedSocket } = require('./index');
 
 class User {
     constructor(userInfo) {
@@ -20,7 +22,7 @@ class User {
                     second_user_id = ${this.id} )`;
                     DB.query(sql, (err, result) => {
                         if (err) {
-                            connectedSockets[this.id].emit(Events.SEND_MESSAGE, Error.unknowError());
+                            getConnectedSocket(this.id).emit(Events.SEND_MESSAGE, Error.unknowError());
                         }
                         else {
                             chatID = result[0].chat_id;
@@ -91,6 +93,121 @@ class User {
         });
     }
 
+    requestFriend(data) {
+        // relationship
+        // 0: friend
+        // 1: pending_1_2
+        // 2: pending_2_1
+        // 3: blocking_1_2
+        // 4: blocking_2_1
+        const { userEmail } = data;
+        try {
+            const sql = `SELECT * FROM accounts WHERE email = ${DB.escape(userEmail)}`;
+            DB.query(sql, (err, result) => {
+                if (err) {
+                    getConnectedSocket(this.id).emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
+                }
+                else {
+                    const secondUserID = result[0].account_id;
+                    const sql = `INSERT INTO relationship (first_user_id, second_user_id, type) VALUES (${this.id}, ${secondUserID}, 1)`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            getConnectedSocket(this.id).emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
+                        }
+                        else {
+                            const socket = getConnectedSocket(secondUserID);
+                            if (socket !== undefined && socket !== null) {
+                                socket.emit(Events.NOTIFY_FRIEND_REQUEST, {
+                                    error: false,
+                                    message: 'PENDING_FRIEND_REQUEST',
+                                    userInfo: this.exportInfo()
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    responseFriendRequest(data) {
+        const { isAccept, userID } = data;
+        if (isAccept === true) {
+            const chatID = uniqid.process();
+            const sql = `INSERT INTO chat_box (chat_id) VALUES (${chatID})`;
+            DB.query(sql, (err, result) => {
+                if (err) {
+                    getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                }
+                else {
+                    const sql = `INSERT INTO private_chat (first_user_id, second_user_id, chat_id) 
+                                VALUES (${this.id}, ${userID}, '${chatID}')`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                        }
+                        else {
+                            const sql = `UPDATE relationship SET type = 0 WHERE (first_user_id = ${this.id} AND second_user_id = ${userID})
+                                                                                OR (first_user_id = ${userID} AND second_user_id = ${this.id})`;
+                            DB.query(sql, (err, result) => {
+                                if (err) {
+                                    getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
+                                }
+                                else {
+                                    getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, {
+                                        error: false,
+                                        message: 'ACCEPT_SUCCESSFULLY'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+    
+    requestListFriend(data) {
+        const sql = `SELECT * FROM relationship WHERE (first_user_id = ${this.id} AND type = 0) OR
+                                                        (second_user_id = ${this.id} AND type = 0)`;
+        DB.query(sql, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                const totalFriend = result.length;
+                result.map((user) => {
+                    // Get friendID
+                    const friendID = user.first_user_id;    
+                    if (friendID === this.id) {
+                        friendID = user.second_user_id;
+                    }
+
+                    const  sql = `SELECT * FROM accounts WHERE account_id = ${friendID}`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            this.listFriend.push({
+                                id: result[0].account_id,
+                                email: result[0].email
+                            });
+                            if (this.listFriend.length === totalFriend) {
+                                getConnectedSocket(this.id).emit(Events.RESPONSE_LIST_FRIEND, {
+                                    error: false,
+                                    listFriend: this.listFriend
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }
+    
     exportInfo() {
         return {
             id: this.id,

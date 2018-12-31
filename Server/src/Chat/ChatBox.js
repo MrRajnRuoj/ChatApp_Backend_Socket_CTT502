@@ -11,7 +11,6 @@ class ChatBox {
         try {
             this.listUserID.forEach((userID) => {
                 let socket = getConnectedSocket(userID);
-                console.log(socket + ' - ' + userID);
                 if (socket !== undefined && socket !== null) {
                     socket.emit(Events.RECIEVE_MESSAGE, {
                         senderID: sender.id,
