@@ -5,7 +5,8 @@ const db_config = {
     host: 'den1.mysql5.gear.host',
     user: 'group4chatapp1',
     password: 'Jl269yt8!-6H',
-    database: 'group4chatapp1'
+    database: 'group4chatapp1',
+    dateStrings: true
 };
 
 let DBConnection;

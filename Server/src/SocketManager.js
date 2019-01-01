@@ -42,4 +42,8 @@ module.exports = function(socket) {
     socket.on(Events.REQUEST_LIST_FRIEND, (data) => {
         getConnectedUser(socket.id).requestListFriend(data);
     });
+
+    socket.on(Events.REQUEST_MESSAGE, (data) => {
+        getConnectedUser(socket.id).requestMessage(data);
+    });
 }

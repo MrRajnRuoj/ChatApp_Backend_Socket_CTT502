@@ -323,4 +323,48 @@
 |   email  | String | Email của user    |
 
 
+### 20. Request Message
+**Method:** `emit`
+
+**Event:** `RESPONSE_MESSAGE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| chatID    | String | chatID của chatbox    |
+| toUserID    |  Int    |   ID của bạn đang chat (private chat) |
+
+
+### 21. Response from Request Message
+**Method:** `on`
+
+**Event:** `RESPONSE_MESSAGE`
+
+**Parameter:**
+
+| Field    | Type   | Description       |
+|:----------:|:--------:|:-------------------:|
+| error    | Boolean | Có lỗi: `true`, không lỗi: `false`    |
+| message | String | Thông điệp trả về |
+| messageData | Array Object | Danh sách tin nhắn |
+
+
+**[object]**
+
+|   Field  |  Type  |    Description    |
+|:--------:|:------:|:-----------------:|
+|  sender  | String | Email người gửi   |
+|  message  | String | Nội dung tin nhắn    |
+| time  | String    | Thời gian gửi tính theo UTC +0, format: "yyyy-mm-dd hh:mm:ss" |
+| chatID | String | chatID của chat box |
+
+
+**[message]**
+
+| Error Status |             Label             |                 Description                 |
+|:------------:|:-----------------------------:|:-------------------------------------------:|
+|     true     | `UNKNOW_ERROR`                  | Lỗi không xác định :))                      |
+
+
 ## vẫn còn tiếp....

@@ -3,7 +3,7 @@ const uniqid = require('uniqid');
 const Events = require('./../Events/Events');
 const Error = require('./../Errors/Error');
 const { ChatBox, getConnectedChat } = require('./../Chat');
-const { getConnectedSocket } = require('./index');
+const { getConnectedSocket, getConnectedUser } = require('./index');
 
 class User {
     constructor(userInfo) {
@@ -108,6 +108,7 @@ class User {
                     getConnectedSocket(this.id).emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
                 }
                 else {
+                    if (result.length === 0) return;
                     const secondUserID = result[0].account_id;
                     const sql = `INSERT INTO relationship (first_user_id, second_user_id, type) VALUES (${this.id}, ${secondUserID}, 1)`;
                     DB.query(sql, (err, result) => {
@@ -116,6 +117,7 @@ class User {
                         }
                         else {
                             const socket = getConnectedSocket(secondUserID);
+                            console.log(getConnectedUser(socket.id));
                             if (socket !== undefined && socket !== null) {
                                 socket.emit(Events.NOTIFY_FRIEND_REQUEST, {
                                     error: false,
@@ -136,16 +138,20 @@ class User {
         const { isAccept, userID } = data;
         if (isAccept === true) {
             const chatID = uniqid.process();
-            const sql = `INSERT INTO chat_box (chat_id) VALUES (${chatID})`;
+            console.log('chatID: ' + chatID);
+            const sql = `INSERT INTO chat_box (chat_id) VALUES ('${chatID}')`;
             DB.query(sql, (err, result) => {
                 if (err) {
+                    console.log('err while insert chatID');
                     getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                 }
                 else {
+                    console.log('chatID: ' + chatID);
                     const sql = `INSERT INTO private_chat (first_user_id, second_user_id, chat_id) 
                                 VALUES (${this.id}, ${userID}, '${chatID}')`;
                     DB.query(sql, (err, result) => {
                         if (err) {
+                            console.log('err while insert to private chat');
                             getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                         }
                         else {
@@ -153,6 +159,7 @@ class User {
                                                                                 OR (first_user_id = ${userID} AND second_user_id = ${this.id})`;
                             DB.query(sql, (err, result) => {
                                 if (err) {
+                                    console.log('err while update relationship');
                                     getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                                 }
                                 else {
@@ -174,13 +181,19 @@ class User {
                                                         (second_user_id = ${this.id} AND type = 0)`;
         DB.query(sql, (err, result) => {
             if (err) {
-                console.log(err);
+                console.log('err while get list friend: ' + err);
             }
             else {
                 const totalFriend = result.length;
+                if (totalFriend === 0) {   
+                    getConnectedSocket(this.id).emit(Events.RESPONSE_LIST_FRIEND, {
+                        error: false,
+                        listFriend: this.listFriend
+                    });
+                }
                 result.map((user) => {
                     // Get friendID
-                    const friendID = user.first_user_id;    
+                    let friendID = user.first_user_id;    
                     if (friendID === this.id) {
                         friendID = user.second_user_id;
                     }
@@ -208,6 +221,67 @@ class User {
         });
     }
     
+    requestMessage(data) {
+        let { chatID } = data;
+        if (chatID === null || chatID === undefined) {    // private chat may be don't have chatID
+            const sql = `SELECT * FROM private_chat WHERE ( first_user_id = ${this.id} AND 
+                    second_user_id = ${data.toUserID} ) OR ( first_user_id = ${data.toUserID} AND 
+                    second_user_id = ${this.id} )`;
+            DB.query(sql, (err, result) => {
+                if (err) {
+                    getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, Error.unknowError());
+                }
+                else {
+                    if (result.length === 0) {
+                        console.log('chat_id not exists');
+                        return;
+                    }
+                    chatID = result[0].chat_id;
+                    this.getMessage(chatID);
+                }
+            });
+        }
+        else {
+            this.getMessage(chatID);
+        }
+    }
+    
+    getMessage(chatID) {
+        const sql = `SELECT * FROM message WHERE chat_id = '${chatID}'`;
+        let messageData = [];
+        DB.query(sql, (err, result) => {
+            if (err) {
+                console.log('Err while get message from chatbox: ' + err);
+                getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, Error.unknowError());
+            }
+            let numMessage = result.length;
+            result.map((row) => {
+                // Get sender's name
+                const sql = `SELECT * FROM accounts WHERE account_id = ${row.sender_id}`;
+                DB.query(sql, (err, result) => {
+                    if (err) {
+                        console.log(`Err while get sender's name: ${err}`);
+                    }
+                    else {
+                        let strTime = row.time;
+                        messageData.push({
+                            sender: result[0].email,
+                            message: row.message,
+                            time: strTime.slice(0, 19).replace("T", " "),
+                            chatID: row.chat_id
+                        });
+                        if (messageData.length === numMessage) {
+                            getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, {
+                                error: false,
+                                messageData
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    }
+
     exportInfo() {
         return {
             id: this.id,
