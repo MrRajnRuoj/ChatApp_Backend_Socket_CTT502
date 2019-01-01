@@ -185,6 +185,12 @@ class User {
             }
             else {
                 const totalFriend = result.length;
+                if (totalFriend === 0) {   
+                    getConnectedSocket(this.id).emit(Events.RESPONSE_LIST_FRIEND, {
+                        error: false,
+                        listFriend: this.listFriend
+                    });
+                }
                 result.map((user) => {
                     // Get friendID
                     const friendID = user.first_user_id;    
