@@ -326,7 +326,7 @@
 ### 20. Request Message
 **Method:** `emit`
 
-**Event:** `RESPONSE_MESSAGE`
+**Event:** `REQUEST_MESSAGE`
 
 **Parameter:**
 
@@ -339,7 +339,7 @@
 ### 21. Response from Request Message
 **Method:** `on`
 
-**Event:** `RESPONSE_MESSAGE`
+**Event:** `REQUEST_MESSAGE`
 
 **Parameter:**
 

@@ -249,6 +249,7 @@ class User {
     getMessage(chatID) {
         const sql = `SELECT * FROM message WHERE chat_id = '${chatID}'`;
         let messageData = [];
+        let senderName = {};
         DB.query(sql, (err, result) => {
             if (err) {
                 console.log('Err while get message from chatbox: ' + err);
@@ -256,28 +257,45 @@ class User {
             }
             let numMessage = result.length;
             result.map((row) => {
-                // Get sender's name
-                const sql = `SELECT * FROM accounts WHERE account_id = ${row.sender_id}`;
-                DB.query(sql, (err, result) => {
-                    if (err) {
-                        console.log(`Err while get sender's name: ${err}`);
-                    }
-                    else {
-                        let strTime = row.time;
-                        messageData.push({
-                            sender: result[0].email,
-                            message: row.message,
-                            time: strTime.slice(0, 19).replace("T", " "),
-                            chatID: row.chat_id
-                        });
-                        if (messageData.length === numMessage) {
-                            getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, {
-                                error: false,
-                                messageData
-                            });
+                let strTime = row.time;
+                if (senderName[row.sender_id] === undefined || senderName[row.sender_id] === null) {
+                    // Get sender's name
+                    const sql = `SELECT * FROM accounts WHERE account_id = ${row.sender_id}`;
+                    DB.query(sql, (err, result) => {
+                        if (err) {
+                            console.log(`Err while get sender's name: ${err}`);
                         }
+                        else {
+                            senderName[row.sender_id] = result[0].email;
+                            messageData.push({
+                                sender: result[0].email,
+                                message: row.message,
+                                time: strTime.slice(0, 19).replace("T", " "),
+                                chatID: row.chat_id
+                            });
+                            if (messageData.length === numMessage) {
+                                getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, {
+                                    error: false,
+                                    messageData
+                                });
+                            }
+                        }
+                    });
+                }
+                else {
+                    messageData.push({
+                        sender: senderName[row.sender_id],
+                        message: row.message,
+                        time: strTime.slice(0, 19).replace("T", " "),
+                        chatID: row.chat_id
+                    });
+                    if (messageData.length === numMessage) {
+                        getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, {
+                            error: false,
+                            messageData
+                        });
                     }
-                });
+                }
             });
         });
     }
