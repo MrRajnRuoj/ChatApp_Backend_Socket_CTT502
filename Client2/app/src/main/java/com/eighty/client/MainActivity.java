@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -293,7 +294,10 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Boolean error = object.getBoolean("error");
                         if (error) {
-
+                            Toast.makeText(MainActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(MainActivity.this, "Gửi yêu cầu thành công", Toast.LENGTH_SHORT).show();
                         }
                     }
                     catch (JSONException e) {

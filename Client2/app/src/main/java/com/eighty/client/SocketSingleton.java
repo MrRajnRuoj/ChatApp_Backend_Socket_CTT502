@@ -8,7 +8,7 @@ import io.socket.client.Socket;
 class SocketSingleton {
     private static final SocketSingleton ourInstance = new SocketSingleton();
 //    private static final String SERVER_ADDRESS = "https://chatapp-224217.appspot.com";
-    private static final String SERVER_ADDRESS = "http://192.168.1.8:3231";
+    private static final String SERVER_ADDRESS = "http://192.168.1.6:3231";
 
     private static Socket socket;
 
