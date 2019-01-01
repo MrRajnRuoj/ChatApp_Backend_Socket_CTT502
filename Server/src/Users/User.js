@@ -221,6 +221,67 @@ class User {
         });
     }
     
+    requestMessage(data) {
+        let { chatID } = data;
+        if (chatID === null || chatID === undefined) {    // private chat may be don't have chatID
+            const sql = `SELECT * FROM private_chat WHERE ( first_user_id = ${this.id} AND 
+                    second_user_id = ${data.toUserID} ) OR ( first_user_id = ${data.toUserID} AND 
+                    second_user_id = ${this.id} )`;
+            DB.query(sql, (err, result) => {
+                if (err) {
+                    getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, Error.unknowError());
+                }
+                else {
+                    if (result.length === 0) {
+                        console.log('chat_id not exists');
+                        return;
+                    }
+                    chatID = result[0].chat_id;
+                    this.getMessage(chatID);
+                }
+            });
+        }
+        else {
+            this.getMessage(chatID);
+        }
+    }
+    
+    getMessage(chatID) {
+        const sql = `SELECT * FROM message WHERE chat_id = '${chatID}'`;
+        let messageData = [];
+        DB.query(sql, (err, result) => {
+            if (err) {
+                console.log('Err while get message from chatbox: ' + err);
+                getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, Error.unknowError());
+            }
+            let numMessage = result.length;
+            result.map((row) => {
+                // Get sender's name
+                const sql = `SELECT * FROM accounts WHERE account_id = ${row.sender_id}`;
+                DB.query(sql, (err, result) => {
+                    if (err) {
+                        console.log(`Err while get sender's name: ${err}`);
+                    }
+                    else {
+                        let strTime = row.time;
+                        messageData.push({
+                            sender: result[0].email,
+                            message: row.message,
+                            time: strTime.slice(0, 19).replace("T", " "),
+                            chatID: row.chat_id
+                        });
+                        if (messageData.length === numMessage) {
+                            getConnectedSocket(this.id).emit(Events.REQUEST_MESSAGE, {
+                                error: false,
+                                messageData
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    }
+
     exportInfo() {
         return {
             id: this.id,
