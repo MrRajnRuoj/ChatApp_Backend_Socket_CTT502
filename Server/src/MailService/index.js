@@ -28,8 +28,8 @@ const sendVerifyCode = (socket, code, email, callback) => {
         to: email, // list of receivers
         subject: 'Verify your e-mail address', // Subject line
         text: 'Welcome to Zoola!', // plain text body
-        html: `<p>Chào mừng thí chú đến với động Zoola</p>
-                <p>Đây là Code full hd không che: <span>${code}</span></p>` // html body
+        html: `<p>Chào mừng bạn đến với Zoola</p>
+                <p>Đây là mã xác thực tài khoản: <span>${code}</span></p>` // html body
     };
 
     transporter.sendMail(message, (error, info) => {
