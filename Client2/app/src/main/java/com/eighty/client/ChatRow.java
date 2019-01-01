@@ -1,11 +1,11 @@
 package com.eighty.client;
 
-public class Chat {
+public class ChatRow {
 
     String email;
     int id;
 
-    public Chat(String email, int id) {
+    public ChatRow(String email, int id) {
         this.email = email;
         this.id = id;
     }

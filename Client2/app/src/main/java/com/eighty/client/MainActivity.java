@@ -1,6 +1,5 @@
 package com.eighty.client;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,16 +20,15 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import io.socket.emitter.Emitter;
 
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView header_email;
 
     private ListView listChat;
-    private ArrayList<Chat> arrayList;
+    private ArrayList<ChatRow> arrayList;
     private ListChatAdapter adapter;
 
     @Override
@@ -90,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         JSONArray listFriend = object.getJSONArray("listFriend");
                         for (int i = 0; i < listFriend.length(); i++) {
-                            arrayList.add(new Chat(listFriend.getJSONObject(i).getString("email"), listFriend.getJSONObject(i).getInt("id")));
+                            arrayList.add(new ChatRow(listFriend.getJSONObject(i).getString("email"), listFriend.getJSONObject(i).getInt("id")));
                         }
                         adapter.notifyDataSetChanged();
                         SocketSingleton.getSocket().off("RESPONSE_LIST_FRIEND");
@@ -203,6 +201,17 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 return true;
+            }
+        });
+        listChat.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putInt("id", arrayList.get(position).getId());
+                bundle.putString("email", arrayList.get(position).getEmail());
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }

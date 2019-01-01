@@ -13,9 +13,9 @@ import java.util.ArrayList;
 public class ListChatAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Chat> arrayList;
+    private ArrayList<ChatRow> arrayList;
 
-    public ListChatAdapter(Context context, ArrayList<Chat> arrayList) {
+    public ListChatAdapter(Context context, ArrayList<ChatRow> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -50,11 +50,15 @@ public class ListChatAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(R.layout.custom_listchat_row, null);
             viewHolder = new ViewHolder();
             viewHolder.txtEmail = convertView.findViewById(R.id.txtEmail);
+            viewHolder.imgAva = convertView.findViewById(R.id.imgAva);
+            viewHolder.txtEmail.setText(arrayList.get(position).getEmail());
+            viewHolder.imgAva.setImageResource(R.drawable.ic_person);
             convertView.setTag(viewHolder);
         }
         else {
             viewHolder = (ViewHolder) convertView.getTag();
             viewHolder.txtEmail.setText(arrayList.get(position).getEmail());
+            viewHolder.imgAva.setImageResource(R.drawable.ic_person);
         }
 
         return convertView;

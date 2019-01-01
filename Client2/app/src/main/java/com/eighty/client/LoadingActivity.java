@@ -1,13 +1,17 @@
 package com.eighty.client;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 import io.socket.emitter.Emitter;
 
@@ -20,28 +24,46 @@ public class LoadingActivity extends AppCompatActivity {
 
         SocketSingleton.getSocket().connect();
 
-        SharedPreferences sharedPreferences = getSharedPreferences("secret", Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString("token", "");
+//        if (!SocketSingleton.getSocket().connected()) {
+//            AlertDialog.Builder alertDialog = new AlertDialog.Builder(LoadingActivity.this);
+//            alertDialog.setMessage("Không thể kết nối đến server, ứng dụng sẽ tự động đóng");
+//            alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    finishAndRemoveTask();
+//                }
+//            });
+//            alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                @Override
+//                public void onCancel(DialogInterface dialog) {
+//                    finishAndRemoveTask();
+//                }
+//            });
+//            alertDialog.show();
+//        }
+//        else {
+            SharedPreferences sharedPreferences = getSharedPreferences("secret", Context.MODE_PRIVATE);
+            String token = sharedPreferences.getString("token", "");
 
-        if (token != null && !token.equals("")) {
+            if (token != null && !token.equals("")) {
 //            Intent intent = new Intent(LoadingActivity.this, LoginActivity.class);
 //            Bundle bundle = new Bundle();
 //            bundle.putString("token", token);
 //            intent.putExtras(bundle);
 //            startActivity(intent);
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("token", token);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("token", token);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                SocketSingleton.getSocket().emit("REQUEST_LOGIN", obj);
+                SocketSingleton.getSocket().on("RESPONSE_LOGIN", onResponseLogin);
+            } else {
+                startActivity(new Intent(LoadingActivity.this, StartActivity.class));
+                finish();
             }
-            SocketSingleton.getSocket().emit("REQUEST_LOGIN", obj);
-            SocketSingleton.getSocket().on("RESPONSE_LOGIN", onResponseLogin);
-        }
-        else {
-            startActivity(new Intent(LoadingActivity.this, StartActivity.class));
-            finish();
-        }
+        //}
     }
 
     private Emitter.Listener onResponseLogin = new Emitter.Listener() {
