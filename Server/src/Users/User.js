@@ -193,7 +193,7 @@ class User {
                 }
                 result.map((user) => {
                     // Get friendID
-                    const friendID = user.first_user_id;    
+                    let friendID = user.first_user_id;    
                     if (friendID === this.id) {
                         friendID = user.second_user_id;
                     }
