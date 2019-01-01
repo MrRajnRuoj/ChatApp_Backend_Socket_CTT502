@@ -3,7 +3,7 @@ const uniqid = require('uniqid');
 const Events = require('./../Events/Events');
 const Error = require('./../Errors/Error');
 const { ChatBox, getConnectedChat } = require('./../Chat');
-const { getConnectedSocket } = require('./index');
+const { getConnectedSocket, getConnectedUser } = require('./index');
 
 class User {
     constructor(userInfo) {
@@ -108,6 +108,7 @@ class User {
                     getConnectedSocket(this.id).emit(Events.REQUEST_ADD_FRIEND, Error.unknowError());
                 }
                 else {
+                    if (result.length === 0) return;
                     const secondUserID = result[0].account_id;
                     const sql = `INSERT INTO relationship (first_user_id, second_user_id, type) VALUES (${this.id}, ${secondUserID}, 1)`;
                     DB.query(sql, (err, result) => {
@@ -116,6 +117,7 @@ class User {
                         }
                         else {
                             const socket = getConnectedSocket(secondUserID);
+                            console.log(getConnectedUser(socket.id));
                             if (socket !== undefined && socket !== null) {
                                 socket.emit(Events.NOTIFY_FRIEND_REQUEST, {
                                     error: false,
@@ -136,16 +138,20 @@ class User {
         const { isAccept, userID } = data;
         if (isAccept === true) {
             const chatID = uniqid.process();
-            const sql = `INSERT INTO chat_box (chat_id) VALUES (${chatID})`;
+            console.log('chatID: ' + chatID);
+            const sql = `INSERT INTO chat_box (chat_id) VALUES ('${chatID}')`;
             DB.query(sql, (err, result) => {
                 if (err) {
+                    console.log('err while insert chatID');
                     getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                 }
                 else {
+                    console.log('chatID: ' + chatID);
                     const sql = `INSERT INTO private_chat (first_user_id, second_user_id, chat_id) 
                                 VALUES (${this.id}, ${userID}, '${chatID}')`;
                     DB.query(sql, (err, result) => {
                         if (err) {
+                            console.log('err while insert to private chat');
                             getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                         }
                         else {
@@ -153,6 +159,7 @@ class User {
                                                                                 OR (first_user_id = ${userID} AND second_user_id = ${this.id})`;
                             DB.query(sql, (err, result) => {
                                 if (err) {
+                                    console.log('err while update relationship');
                                     getConnectedSocket(this.id).emit(Events.RESPONSE_FRIEND_REQUEST, Error.unknowError());
                                 }
                                 else {
@@ -174,7 +181,7 @@ class User {
                                                         (second_user_id = ${this.id} AND type = 0)`;
         DB.query(sql, (err, result) => {
             if (err) {
-                console.log(err);
+                console.log('err while get list friend: ' + err);
             }
             else {
                 const totalFriend = result.length;
